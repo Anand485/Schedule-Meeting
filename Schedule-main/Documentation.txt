@@ -1,0 +1,55 @@
+Main Files
+index.js - Main app entry point that initializes Express app and routes.
+
+utils/g_cal.js - Contains helper functions for working with Google Calendar API.
+
+.env - Stores app credentials and configuration.
+
+OAuth2 Authentication
+The app uses the google-auth-library to handle OAuth2 authentication with Google APIs.
+
+Key steps:
+
+When app starts, create an OAuth2Client instance configured with the app credentials from .env
+The client will be used to generate auth URLs and make authenticated API calls
+/ route redirects user to Google consent page to authorize scopes
+/callback exchanges auth code for access and refresh tokens
+The tokens are set on the OAuth2Client to authenticate future API requests
+Google Calendar API
+The googleapis library provides a Calendar client.
+
+Main methods used:
+
+calendar.events.list() - Fetch events in a date range
+calendar.events.insert() - Create a new event
+The OAuth2 client is passed to these methods for authentication.
+
+Calculating Empty Slots
+The calculateEmptySlots() utility function takes:
+
+start/end date range
+list of existing events
+desired meeting duration
+It returns an array of "empty slot" objects within the range where a meeting could be booked.
+
+This is used to show available times to book a meeting.
+
+Timezones
+The app handles timezones by:
+
+Accepting timezone strings as input
+Converting start/end dates to timezone before fetching events
+Setting timezone on API request so events are in correct timezone
+This allows the user to check availability in a specific timezone.
+
+Booking Meetings
+The /bookmeeting route uses the Calendar API to create an event.
+
+The start/end ISO strings and event summary are passed in the request.
+
+On success, the created event object is returned.
+
+Error Handling
+Most routes handle errors from the Calendar API and return a 500 status with an error message.
+
+The callback route handles errors from the OAuth2 flow.
